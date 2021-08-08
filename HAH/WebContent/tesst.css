@@ -1,0 +1,91 @@
+@charset "UTF-8";
+@import url('https://fonts.googleapis.com/css2?family=Style+Script&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Brush+Script&display=swap');
+
+	*{
+	font-family: 'Style Script' , 'Nanum Brush Script';
+}
+	*{
+    box-sizing: border-box;
+}
+
+body{
+    margin: 0;
+    padding: 0;
+}
+
+
+video{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.logotext{
+	 
+    height: 30vh;
+    display: flex;
+    align-items: center;
+    justify-content: default;
+}
+
+
+.text{
+	
+    height: 60vh;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: default;
+}
+
+
+
+
+.logotext h2{
+   @import url('https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap');
+    font-family: 'Dancing Script', cursive;
+    font-size: 3em;
+    text-align: justify;
+    color: #E6E0F8;
+    z-index: 1;
+    mix-blend-mode:hard-light;
+}
+
+
+.text h4{
+   @import url('https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap');
+  	font-family: 'Dancing Script', cursive;
+    font-size: 2em;
+    text-align: justify;
+    color: #F7F8E0;
+    z-index: 3;
+    mix-blend-mode:hard-light;
+}
+
+.li {
+    line-height:50%
+}
+	a:link{
+	color:#F7F8E0;
+	text-decoration: none;
+}
+	a:visited {
+	color:#F7F8E0;
+	text-decoration: none; 
+	}
+	a:hover {
+	 color:#F7F8E0;
+	 text-decoration: none;
+	 }
+	
+	
+	
+	
+	
+	
+

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="image/plane.ico">
+<title>팀 소개!</title>
+<style>
+@charset "UTF-8";
+@import url('https://fonts.googleapis.com/css2?family=Style+Script&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Brush+Script&display=swap');
+
+	*{
+	font-family: 'Style Script' , 'Nanum Brush Script';
+}
+	
+	 /* 사이드바 스타일 */
+      .sidenav {
+         height:100%;
+         width: 0;
+         position: fixed;
+         z-index:1;
+         top: 0;
+         left: 0;
+         background-color: #33CCCC;
+         overflow-x: hidden;
+         transition:0.5s ease-in-out;
+         padding-top: 60px;
+         position: absolute;
+      }
+      .sidenav a {
+         padding: 8px 8px 8px 32px;
+         text-decoration: none;
+         font-size: 25px;
+         color: #fff;
+         display: block;
+         transition: 0.2s ease-in-out;
+         
+      }
+      .sidenav a:hover, .offcanvas a:focus {
+         color: #000;
+      }
+      .closebtn {
+         position: absolute;
+         top: 0;
+         right: 25px;
+         font-size: 36px !important;
+         margin-left: 50px;
+      }
+      .openmenu:hover {
+         color:rgb(0,154,200);
+         transition:0.5s ease-in-out;
+      }
+      .openmenu {
+         font-size: 25px;
+         cursor:pointer;
+         transition:0.5s ease-in-out;
+      }
+      .openmenu > i {
+         font-size: 30px;
+      }
+      /* 미디어쿼리 적용 */
+      @media screen and (max-height:450px) {
+         .sidenav {
+            padding-top:15px;
+         }
+         .sidenav a {
+            font-size: 18px;
+         }
+      }
+ 
+</style>
+</head>
+<body style= "background:#E6E6E6 ">
+<center>
+	<h1>HAH_Project</h1>
+	<div id="mysidenav" class="sidenav">
+			<a href="#" class="closebtn" onclick='closeNav()'>x</a>
+			<a href="Team.html"target="_blank">팀 소개!</a>
+			<a href="Lua.html">성민님</a>
+			<a href="HJ.html">희진님</a>
+			<a href="YH.html">윤혁님</a>
+			<a href="KJ.html">경진님</a>
+			<a href="YK.html">여경님</a>
+			<a href="tesst.html">돌아가기!</a>
+			
+		</div>
+
+
+
+		<p>(소근소근) open을 클릭하시면 왼쪽에 사이드바가 열려요..!</p>
+		<span class="openmenu" onclick='openNav()'><i
+			class="fa fa-angle-double-left fa-5" aria-hidden="true"></i><h3> open</h3></span>
+
+		<script>
+		function openNav() {
+			document.getElementById('mysidenav').style.width = '250px';
+		}
+		function closeNav() {
+			document.getElementById('mysidenav').style.width = '0';
+		}
+	</script>
+	
+	</center>
+
+</body>
+</html>

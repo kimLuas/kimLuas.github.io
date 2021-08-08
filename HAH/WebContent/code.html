@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="'https://fonts.gstatic.com'">
+<link
+	href="https://fonts.googleapis.com/css2?family=Do+Hyeon&display=swap"
+	rel="stylesheet">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<title>CODE</title>
+<link rel="icon" href="image/plane.ico">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=STIX+Two+Text&display=swap');
+
+@import
+	url('https://fonts.googleapis.com/css2?family=Nanum+Brush+Script&display=swap')
+	;
+
+* {
+	font-family: 'STIX Two Text', 'Nanum Brush Script';
+}
+
+nav {
+	color: black;
+	background-color: white;
+	width: 100%;
+	height: 50px;
+	line-height: 50px;
+}
+
+.nav_bar {
+	text-align: center;
+	height: 100%;
+}
+
+.back {
+	float: left;
+	margin: 0;
+	width: 50px;
+}
+
+.
+title {
+	position: relative;
+	font-size: 3pem;
+	padding: 30px;
+	font-weight: bold;
+}
+
+.card {
+	margin-top: 10%;
+	margin-bottom: 10%;
+}
+
+.w3-card-4 {
+	width: 60%;
+	height:10%;
+	text-align: center;
+	overflow: auto;
+}
+
+.blogimage {
+	width: 100%;
+	height: 100%;
+}
+</style>
+</head>
+<body style="background: #cfd8cf">
+	<nav>
+		<div class="nav_bar">
+			<img class="back" src="./image/left.png"
+				onclick="location.href='tesst.html'">
+			<h2 class="title">HAH.Project</h2>
+		</div>
+	</nav>
+	<center>
+		<p style="font-size: 50px">CODE</p>
+		<h2>프로그램을 만드는데 사용한 코드들 입니다!</h2>
+		<div class="card">
+			<div class="w3-card-4">
+				<p>package model.movie;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+import hah.JDBC;
+import model.book.BookVO;
+
+public class MovieDAO {
+	static String sql_SELECT_ALL = "SELECT * FROM movie ORDER BY mNum ASC"; // 모든 영화정보 출력
+	static String sql_SELECT_GENRE = "SELECT * FROM movie WHERE mGenre=? ORDER BY mNum ASC";
+	static String sql_SELECT_MNUM = "SELECT * FROM movie WHERE mNum=? ORDER BY mNum ASC";
+	static String sql_INSERT = "INSERT INTO movie VALUES ((SELECT NVL(MAX(mNum),0)+1 FROM movie),?,?,?,?,?)";
+	static String sql_UPDATE = "UPDATE movie SET mName=?, mGenre=?, mRuntime=?, mCast=?, mInfo=? WHERE mNum=?";
+	static String sql_DELETE = "DELETE FROM movie WHERE mNum=?";
+
+	private Connection conn = null;
+	private PreparedStatement pstmt = null;
+	// 멤버변수 선언
+
+//관리자 접근 패스워드 확인========================================================================
+	public boolean adminCheck(MovieVO vo) {
+		boolean check = false; // 아래의 조건 불만족 시 false 반환
+		if (vo.getPassword() == -1) { // 관리자 패스워드 : -1, 입력 시 true 반환
+			check = true;
+		}
+		//System.out.println("관리자 확인 작업");
+		return check;
+	}
+
+//영화 정보 전체 select========================================================================
+	public ArrayList<MovieVO> getMovieList(MovieVO vo) {
+		conn = JDBC.getConnection();
+		ArrayList<MovieVO> datas = new ArrayList();
+		try {
+			pstmt = conn.prepareStatement(sql_SELECT_ALL);
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				MovieVO data = new MovieVO();
+				data.setmNum(rs.getInt("mNum"));
+				data.setmName(rs.getString("mName"));
+				data.setmGenre(rs.getString("mGenre"));
+				data.setmRuntime(rs.getString("mRuntime"));
+				data.setmCast(rs.getString("mCast"));
+				data.setmInfo(rs.getString("mInfo"));
+				datas.add(data);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			JDBC.close(conn, pstmt);
+		}
+		//System.out.println("getMovieList() 수행완료"); // 실행되는거 확인되면 주석처리
+		return datas;
+	}
+
+	// 인자로 받은 영화제목의 고유넘버 select===================================================================
+	public ArrayList<MovieVO> getMnumList(MovieVO vo) {
+		conn = JDBC.getConnection();
+		//MovieVO data = new MovieVO();
+		ArrayList<MovieVO> datas = new ArrayList();
+		try {
+			pstmt = conn.prepareStatement(sql_SELECT_MNUM);
+			pstmt.setInt(1, vo.getmNum());
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				MovieVO data = new MovieVO();
+				data.setmNum(rs.getInt("mNum"));
+				data.setmName(rs.getString("mName"));
+				data.setmGenre(rs.getString("mGenre"));
+				data.setmRuntime(rs.getString("mRuntime"));
+				data.setmCast(rs.getString("mCast"));
+				data.setmInfo(rs.getString("mInfo"));
+				datas.add(data);
+			}
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			JDBC.close(conn, pstmt);
+		}
+		//System.out.println("getMnumList() 수행완료"); // 실행되는거 확인되면 주석처리
+		return datas;
+	}
+	
+	
+	public MovieVO checkMnum(BookVO vo) {
+	      conn=JDBC.getConnection(); // JDBC 클래스에서 만든 커넥션 연결
+	      
+	      MovieVO data=null; // 임의로 'data'라는 BookVO 클래스 만들어서
+	      try {
+	         pstmt=conn.prepareStatement(sql_SELECT_MNUM); // 위에 있는 sql문으로 
+	         // select * from book where ticket=? : SQL_SELECT_ONE
+	         pstmt.setInt(1, vo.getmNum()); // ?에 예약자에게 입력받은 티켓넘버 넣고
+	         ResultSet rs=pstmt.executeQuery(); // DB에 저장된 정보 불러와서
+	         if(rs.next()) { // 그 정보를
+	            data=new MovieVO(); // 임의로 만들어놓은 'data'에  
+	            data.setmNum(rs.getInt("mNum"));
+				data.setmName(rs.getString("mName"));
+				data.setmGenre(rs.getString("mGenre"));
+				data.setmRuntime(rs.getString("mRuntime"));
+				data.setmCast(rs.getString("mCast"));
+				data.setmInfo(rs.getString("mInfo"));
+	         }
+	         rs.close(); // 다 쓰고 rs 바로 닫음
+	      } catch (SQLException e) {
+	         e.printStackTrace();
+	      } finally {
+	         JDBC.close(conn, pstmt); // Connection&PrepareStatement close!!
+	      }
+	      return data; // 그리고 불러온 정보 임의저장한 'data' 리턴!
+	   }
+	
+	public MovieVO delMnum(MovieVO vo) {
+	      conn=JDBC.getConnection(); // JDBC 클래스에서 만든 커넥션 연결
+	      
+	      MovieVO data=null; // 임의로 'data'라는 BookVO 클래스 만들어서
+	      try {
+	         pstmt=conn.prepareStatement(sql_SELECT_MNUM); // 위에 있는 sql문으로 
+	         // select * from book where ticket=? : SQL_SELECT_ONE
+	         pstmt.setInt(1, vo.getmNum()); // ?에 예약자에게 입력받은 티켓넘버 넣고
+	         ResultSet rs=pstmt.executeQuery(); // DB에 저장된 정보 불러와서
+	         if(rs.next()) { // 그 정보를
+	            data=new MovieVO(); // 임의로 만들어놓은 'data'에  
+	            data.setmNum(rs.getInt("mNum"));
+				data.setmName(rs.getString("mName"));
+				data.setmGenre(rs.getString("mGenre"));
+				data.setmRuntime(rs.getString("mRuntime"));
+				data.setmCast(rs.getString("mCast"));
+				data.setmInfo(rs.getString("mInfo"));
+	         }
+	         rs.close(); // 다 쓰고 rs 바로 닫음
+	      } catch (SQLException e) {
+	         e.printStackTrace();
+	      } finally {
+	         JDBC.close(conn, pstmt); // Connection&PrepareStatement close!!
+	      }
+	      return data; // 그리고 불러온 정보 임의저장한 'data' 리턴!
+	   }
+	
+//장르를 인자로 받고 해당 장르의 영화 select===================================================================
+	public ArrayList<MovieVO> getGenreList(MovieVO vo) {
+		conn = JDBC.getConnection();
+		ArrayList<MovieVO> datas = new ArrayList();
+		try {
+			pstmt = conn.prepareStatement(sql_SELECT_GENRE);
+			pstmt.setString(1, vo.getmGenre());
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				MovieVO data = new MovieVO();
+				data.setmNum(rs.getInt("mNum"));
+				data.setmName(rs.getString("mName"));
+				data.setmGenre(rs.getString("mGenre"));
+				data.setmRuntime(rs.getString("mRuntime"));
+				data.setmCast(rs.getString("mCast"));
+				data.setmInfo(rs.getString("mInfo"));
+				datas.add(data);
+			}
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			JDBC.close(conn, pstmt);
+		}
+		//System.out.println("getMovieList() 수행완료"); // 실행되는거 확인되면 주석처리
+		return datas;
+	}
+	
+	public MovieVO checkMgenre(MovieVO vo) {
+	      conn=JDBC.getConnection(); // JDBC 클래스에서 만든 커넥션 연결
+	      
+	      MovieVO data=null; // 임의로 'data'라는 BookVO 클래스 만들어서
+	      try {
+	         pstmt=conn.prepareStatement(sql_SELECT_GENRE); // 위에 있는 sql문으로 
+	         // select * from book where ticket=? : SQL_SELECT_ONE
+	         pstmt.setString(1, vo.getmGenre()); // ?에 예약자에게 입력받은 티켓넘버 넣고
+	         ResultSet rs=pstmt.executeQuery(); // DB에 저장된 정보 불러와서
+	         if(rs.next()) { // 그 정보를
+	            data=new MovieVO(); // 임의로 만들어놓은 'data'에  
+	            data.setmNum(rs.getInt("mNum"));
+				data.setmName(rs.getString("mName"));
+				data.setmGenre(rs.getString("mGenre"));
+				data.setmRuntime(rs.getString("mRuntime"));
+				data.setmCast(rs.getString("mCast"));
+				data.setmInfo(rs.getString("mInfo"));
+	         }
+	         rs.close(); // 다 쓰고 rs 바로 닫음
+	      } catch (SQLException e) {
+	         e.printStackTrace();
+	      } finally {
+	         JDBC.close(conn, pstmt); // Connection&PrepareStatement close!!
+	      }
+	      return data; // 그리고 불러온 정보 임의저장한 'data' 리턴!
+	   }
+
+	// 영화 추가=====================================================================
+	public void insertMovie(MovieVO vo) {
+		conn = JDBC.getConnection();
+		try {
+			pstmt = conn.prepareStatement(sql_INSERT);
+			pstmt.setString(1, vo.getmName());
+			pstmt.setString(2, vo.getmGenre());
+			pstmt.setString(3, vo.getmRuntime());
+			pstmt.setString(4, vo.getmCast());
+			pstmt.setString(5, vo.getmInfo());
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			JDBC.close(conn, pstmt);
+		}
+		//System.out.println("insertMovie() 수행완료"); // 실행되는거 확인되면 주석처리
+	}
+
+	// 영화 변경=====================================================================
+	public void updateMovie(MovieVO vo) { // 정보 전부 변경
+
+		conn = JDBC.getConnection();
+		try {
+			pstmt = conn.prepareStatement(sql_UPDATE);
+			pstmt.setString(1, vo.getmName());
+			pstmt.setString(2, vo.getmGenre());
+			pstmt.setString(3, vo.getmRuntime()); // rs.setmName("vo.getmName");
+			pstmt.setString(4, vo.getmCast());
+			pstmt.setString(5, vo.getmInfo());
+			pstmt.setInt(6, vo.getmNum());
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			JDBC.close(conn, pstmt);
+		}
+		//System.out.println("updateMovie() 수행완료"); // 실행되는거 확인되면 주석처리
+	}
+
+// 영화 삭제=====================================================================
+	public void deleteMovie(MovieVO vo) {
+
+		conn = JDBC.getConnection();
+		try {
+			pstmt = conn.prepareStatement(sql_DELETE);
+			pstmt.setInt(1, vo.getmNum()); // mNum 인자받아 해당 영화 삭제
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			JDBC.close(conn, pstmt);
+		}
+		//System.out.println("deleteMovie() 수행완료"); // 실행되는거 확인되면 주석처리
+	}
+}
+				</p>
+				<div class="w3-container w3-center">
+					<p style="font-size: 20px">Model DAO</p>
+				</div>
+			</div>
+		</div>
+
+		<div class="card">
+	<div class="w3-card-4">
+	<p>package controller;
+
+import java.util.ArrayList;
+
+import model.book.BookDAO;
+import model.book.BookVO;
+import model.movie.MovieDAO;
+import model.movie.MovieVO;
+import view.View;
+
+public class Controller {
+	BookVO bvo;
+	BookDAO bdao;
+	MovieVO mvo;
+	MovieDAO mdao;
+	View view;
+	public Controller() {
+		view=new View();
+		this.Controll();
+	}
+	public void Controll() {
+		//bvo=new BookVO();
+		bvo=view.bvo;
+		bdao=new BookDAO();
+		//mvo=new MovieVO();
+		mvo=view.mvo;
+		mdao=new MovieDAO();
+
+		view.start();
+		while(true) {
+			view.viewMain();
+			// 사용자
+			if(view.button==1) { // 사용자모드시작
+				while(true) {
+					view.userView();
+					if(view.button==1) { // 예매 시작
+						//ArrayList<MovieVO> mdatas=mdao.getMovieList(mvo);
+						view.showList(mdao.getMovieList(mvo));
+						while(true) {
+							view.userView1();
+							if(mdao.checkMnum(bvo)==null) {
+								view.wrongcheck();
+								continue;
+							}
+							else {
+								view.userView1by2();
+								break;
+							}
+						}
+						//if(mdao.getMnumList(bvo)==null)
+						while(true) {
+							view.userViewMday();
+							if(view.button==1) {
+								bvo.setmDay("8월9일");
+								break;
+							}
+							else if(view.button==2) {
+								bvo.setmDay("8월10일");
+								break;
+							}
+							else if(view.button==3) {
+								bvo.setmDay("8월11일");
+								break;
+							}
+							else {
+								continue;
+							}
+						}
+						while(true) {
+							view.userViewMtime();
+							if(view.button==1) {
+								bvo.setmTime("12:00");
+								//break;
+							}
+							else if(view.button==2) {
+								bvo.setmTime("14:00");
+								//break;
+							}
+							else if(view.button==3) {
+								bvo.setmTime("16:00");
+								//break;
+							}
+							else {
+								continue;
+							}
+							view.ticketComplete();
+							break;
+						}
+						bdao.bookTicket(bvo);
+						view.bookingSuccessInfo(bdao.TicketNum(bvo));
+					}//예매 끝
+
+					else if(view.button==2) { // 예매확인 시작
+						BookVO bdata=bdao.checkTicket(bvo);
+						while(true) {
+							view.userView2(bdata);
+							if(bdao.checkPhone(bvo)==null) {
+								view.wrongback();
+								break;
+							}
+							else {
+								while(true) {
+									view.checkTicket();
+									if(bdao.checkTicket(bvo)==null) {
+										view.wrongback();
+										continue;
+									}
+									else {
+										view.bookingCheck(bdao.checkTicket(bvo));
+										while(true) {
+											bdata=bdao.checkTicket(bvo);
+											if(bdata==null) {
+												view.wrongcheck();
+												break;
+											}
+											else {
+												view.userView2by();
+												if(view.button==1) {
+													view.userView2by1();
+													bdao.checkTicket(bvo);
+													bdao.cancelTicket(bvo);
+													break;
+												}
+												else if(view.button==2) {
+													view.userView2by2();
+													break;
+												}
+												else {
+													view.wrongcheck();
+													continue;
+												}
+											}
+										}
+										break;
+									}
+								}
+								break;
+							}
+						}
+					} // 예매확인 끝
+
+					else if (view.button==3) { // 영화검색 시작
+						while(true) {
+							view.userView3();
+							if(view.button==1) {
+								//ArrayList<MovieVO> mdatas=mdao.getMovieList(mvo);
+								view.userView3by1();
+								view.showList_searchNum(mdao.getMnumList(mvo));
+							}
+							else if(view.button==2) {
+								view.userView3by2();
+								if(mdao.checkMgenre(mvo)==null) {
+									view.showListEmpty();
+									continue;
+								}
+								else {
+									view.showList(mdao.getGenreList(mvo));
+									break;
+								}
+							}
+							else if(view.button==3) {
+								view.userView3by3();
+								break;
+							}
+							else {
+								view.wrongcheck();
+								continue;
+							}
+						}
+					} // 영화검색 끝
+
+					else if(view.button==4) { // 사용자모드 종료 시작
+						view.userView4();
+						break;
+					} // 사용자모드 종료 끝
+					else {
+						view.wrongcheck();
+						continue;
+					}
+				}
+			} // 사용자모드 끝
+
+			// 관리자
+			else if(view.button==2) { // 관리자모드 시작
+				view.adminPasswordCheck();
+				if(mdao.adminCheck(mvo)) {
+					while(true) {
+						ArrayList<MovieVO> mdatas=mdao.getMovieList(mvo);
+						view.adminMovieList(mdatas);
+						view.adminView();
+						if(view.button==1) { // 영화추가 시작
+							view.adminView1();
+							mdao.insertMovie(mvo);
+						} // 영화추가 끝
+
+						else if(view.button==2) { // 영화변경&삭제 시작
+							while(true) { 
+								view.adminView2();
+								if(view.button==1) {
+									while(true) {
+										view.adminView2by1();
+										if(mdao.delMnum(mvo)==null) {
+											view.wrongcheck();
+											continue;
+										}
+										else {
+											view.adminView2by1by1();
+											mdao.updateMovie(mvo);
+											break;
+										}
+									}
+								}
+								else if(view.button==2) {
+									while(true) {
+										view.adminView2by2();
+										if(mdao.delMnum(mvo)==null) {
+											view.wrongcheck();
+											continue;
+										}
+										else {
+											mdao.deleteMovie(mvo);
+											view.deleteSucceed();
+											break;
+										}
+									}
+								}
+								else if(view.button==3) {
+									view.adminView2by3();
+									break;
+								}
+								else {
+									view.wrongcheck();
+									continue;
+								}
+							}
+						} // 영화변경&삭제 끝
+
+						else if(view.button==3) { // 관리자모드 종료 시작
+							view.programEnd();
+							break;
+						} // 관리자모드 종료 끝
+						else {
+							view.wrongcheck();
+							continue;
+						}
+					}
+				}
+				else {
+					view.wrongcheck();
+					continue;
+				}
+			} // 관리자 모드 끝
+
+			// 프로그램종료
+			else if(view.button==3) {
+				view.viewEnd();
+				break;
+			}
+			else {
+				view.wrongcheck();
+				continue;
+			}
+		}
+	}
+}</p>
+	<div class = "w3-container w3-center">
+		<p style="font-size:20px">Controller</p>
+		</div>
+	</div>
+</div>
+
+<div class="card">
+	<div class="w3-card-4">
+	<p>package view;
+
+import java.util.ArrayList;
+import java.util.Scanner;
+
+import model.book.BookVO;
+import model.movie.MovieVO;
+
+public class View {
+	public int ticket; // 티켓넘버 (primary key)
+	public String uName; // 예약자 이름
+	public String uPhone; // 예약자 폰넘버
+	public int mNum; // 영화넘버 (primary & foreign key)
+	public String mName; // 영화 이름
+	public String mDay; // 상영일
+	public String mTime; // 상영 시작 시간
+	public String mGenre; // 영화장르 varchar(20)
+	public String mRuntime; // 러닝타임 varchar(20)
+	public String mCast; // 영화감독 varchar(50),not null
+	public String mInfo; // 영화정보(줄거리) varchar(500)
+	public int password; // 관리자 비밀번호 입력받을 변수
+	public boolean flag = false; // 참 거짓을 판단할 flag변수 VO에 넣어줄꺼
+	public Scanner sc = new Scanner(System.in);
+
+	public int button;
+	public int daybutton;
+	public int timebutton;
+	public BookVO bvo = new BookVO();
+	public MovieVO mvo = new MovieVO();
+
+	// 프로그램 start
+	public void start() {
+		System.out.println("\t■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
+		System.out.println("\t■■■■■■■■■■■■■■■■■■■■[HAH영화관]■■■■■■■■■■■■■■■■■■■■");
+		System.out.println("\t■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
+		System.out.println("\n \t\t\t어서오세요(>UvU<)\n");
+	}
+
+	// 프로그램 menu
+	public void viewMain() {
+		sc = new Scanner(System.in);
+		try {
+			System.out.printf("%20s %15s %15s", "[1]사용자모드", "[2]관리자모드", "[3]프로그램종료\n");
+			System.out.print("Go ▶ ");
+			button = sc.nextInt(); // button --> 메뉴 선택 버튼 변수
+			System.out.println();}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	// 사용자모드 매뉴 출력
+	public void userView() {
+		try {
+			System.out.println("	---------------------------------------------------");
+			System.out.printf("	     사용자모드에 입장하셨습니다. 원하시는 버튼을 선택해주세요:D\n");
+			System.out.println("	---------------------------------------------------");
+			System.out.println();
+			System.out.printf("%15s %15s %15s  %15s\n", "[1]예매", "[2]예매확인", "[3]영화검색", "[4]사용자모드 종료\n");
+			System.out.print("Go ▶ ");
+			button = sc.nextInt();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	// 현재 상영중인 영화리스트
+	public void showList(ArrayList<MovieVO> datas) {
+		System.out.println("-----------------[Movie List]-----------------");
+		if (datas.size() == 0) {
+			return;
+		} else {
+			for (MovieVO v : datas) {
+				System.out.println("[" + v.getmNum() + "] " + v.getmName());
+			}
+		}
+		System.out.println("---------------------------------------------");
+	}
+
+	// 영화검색창에서 영화고유번호 입력시 출력해야하는 영화정보 리스트
+	public void showList_searchNum(ArrayList<MovieVO> datas) {
+		if (datas.size() == 0) {
+			System.out.println("검색한 번호의 영화가 존재하지 않습니다 T0T");
+			System.out.println();
+			return;
+		} else {
+			for (MovieVO v : datas) {
+				System.out.println("[" + v.getmNum() + "] " + v.getmName() + " / " + v.getmGenre() + " / "
+						+ v.getmRuntime() + " / " + v.getmCast() + " / " + v.getmInfo());
+			}
+		}
+	}
+
+	// 사용자모드 1 - 영화예매 , 예약자성명, 휴대폰번호 입력
+	public void userView1() {
+		try {
+			System.out.println();
+			System.out.println("예매할 영화 번호 선택 ▶ ");
+			int mNum = sc.nextInt();
+			// 컨트롤러에서 DB에 몇개의 영화가 있는지 확인해서 검사 필요
+			if (mNum <= 0) {
+				System.out.println("xxxxxx[없는 영화번호]xxxxxx");
+				System.out.println();
+				return;
+			} else {
+				bvo.setmNum(mNum);
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	// 예약자 정보를 입력받아 예약을 한다.
+	public void userView1by2() {
+		try {
+			System.out.println("예약자 성명 ▶ ");
+			String uName = sc.next();
+			bvo.setuName(uName);
+
+			System.out.println("예약자 휴대폰 뒷번호(4자리) ▶ ");
+			String uPhone = sc.next();
+			if (uPhone.length() == 4) {
+				bvo.setuPhone(uPhone);
+			}else {
+				System.out.println("잘못된 입력입니다 :(");
+				return;
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	// 사용자모드 1 - 영화예매 상영일 선택
+	public void userViewMday() {
+		try {	
+			System.out.println("----------------[상영일]----------------");
+			System.out.printf("%s %20s %20s\n", " ① 8월9일 ", "② 8월 10일", "③ 8월 11일");
+			System.out.println("--------------------------------------");
+			System.out.println("상영일 선택 ▶ ");
+			button = sc.nextInt();
+			if (button >= 1 && button <= 3) {
+				return;
+			} else {
+				System.out.println("선택하신 <상영일>은 없는번호(。・ω・。)");
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	// 사용자모드 1 - 영화예매 상영시간 선택
+	public void userViewMtime() {
+		try {
+			System.out.println("----------------[상영시간]----------------");
+			System.out.printf("%s %15s %15s\n", "① 12:00", "② 14:00", "③ 16:00");
+			System.out.println("--------------------------------------");
+			System.out.println("상영시간 선택 ▶ ");
+			button = sc.nextInt();
+			if (button >= 1 && button <= 3) {
+			} else {
+				System.out.println("선택하신 <상영시간>은 없는번호(。・ω・。)");
+				System.out.println();
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void ticketComplete() {
+		System.out.println("★☆★☆[예매 Complete]☆★☆★ \n");
+	}
+
+	// 사용자모드 1 - 예매완료시 완료된 티켓번호 출력
+	public void bookingSuccessInfo(BookVO bvo) {
+		System.out.println("┌─────────────[티겟발급]───────────┐");
+		System.out.println("\t\t" + bvo.getuName() + "님\n\t예매번호: " + bvo.getuPhone() + " - " + bvo.getTicket());
+		System.out.println("└────────────────────────────────┘");
+	}
+
+	// 예매 END ==========================================================================================
+
+	// 예매확인 START =======================================================================================
+	// 사용자모드 2 - 예매확인 예약한 전화번호 확인
+	public void userView2(BookVO bvo) {
+		try {
+			System.out.println("\t■■■■■■■■■■■■■■■■■■[예매내역확인]■■■■■■■■■■■■■■■■■■");
+			System.out.println();
+			while (true) {
+				System.out.println("예약한 전화번호 4자리 ▶ ");
+				String uPhone = sc.next();
+
+				if (uPhone.length() == 4) { // 제대로된 입력이면 break;
+					this.bvo.setuPhone(uPhone);
+					break;
+				} else {
+					System.out.println("잘못된 입력 Again! ::>_<::");
+					System.out.println();
+					continue;
+				}
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	// 사용자모드 2 - 예매확인 티켓번호 확인
+	public void checkTicket() {
+		try {
+			System.out.println("티켓번호  ▶ ");
+			int ticket = sc.nextInt();
+			if (ticket > 0) { // 제대로된 입력이면 break;
+				bvo.setTicket(ticket);
+			} else {
+				System.out.println("잘못된 입력!ಥ_ಥ");
+				System.out.println();
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	// 사용자모드 2 - 예매완료시 완료된 티켓번호 출력
+	public void bookingCheck(BookVO bvo) {
+		System.out.println("┌─────────────[예매내역]───────────┐");
+		System.out.println("\t" + bvo.getuName() + "님  \n\t예매번호 : " + bvo.getuPhone() + "-" + bvo.getTicket() + "\n\t"
+				+ bvo.getmName() + " " + bvo.getmDay() + " " + bvo.getmTime());
+		System.out.println("└────────────────────────────────┘");
+	}
+
+	// 사용자모드 2 의 추가메뉴 선택 / 취소 종료
+	public void userView2by() {
+		try {
+			System.out.println();
+			System.out.printf("%20s %15s\n", "[1]예매취소", "[2]종료");
+			System.out.print("Go ▶ ");
+			button = sc.nextInt();
+			System.out.println();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	// 사용자모드 2 의 추가메뉴 선택 / 취소
+	public void userView2by1() {
+		try {
+			System.out.println();
+			System.out.println("\t■■■■■■■■■■■■■■■■■■■[예매취소]■■■■■■■■■■■■■■■■■■■");
+			System.out.println();
+			System.out.println("취소할 티켓번호 ▶ ");
+			ticket = sc.nextInt();
+			bvo.setTicket(ticket);
+			System.out.println("★☆★☆[예매 취소 Complete]☆★☆★");
+			System.out.println();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	// 사용자모드 2 의 추가메뉴 선택 / 종료
+	public void userView2by2() { // 사용자모드 [2]예매확인-[2]예매종료
+		if (button == 2) {
+			System.out.println("[System]예매확인을 종료합니다.");
+			System.out.println();
+		}
+	}
+
+	// 사용자모드 3 영화정보검색 메뉴출력
+	public void userView3() {
+		try {
+			System.out.println();
+			System.out.println("\t■■■■■■■■■■■■■■■■■■■[영화검색]■■■■■■■■■■■■■■■■■■■");
+			System.out.println();
+			System.out.printf("%20s %15s %15s\n", "① 영화번호로 검색", "② 장르검색", "③ 검색종료");
+			System.out.println("GO ▶");
+			button = sc.nextInt();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	// 사용자모드 3 영화정보검색/ 영화번호로 검색
+	public void userView3by1() {
+		try {
+			if (button == 1) {
+				System.out.println("검색할 영화번호 ▶ ");
+				int mNum = sc.nextInt();
+				mvo.setmNum(mNum);
+			}
+		}catch(Exception e){
+			e.printStackTrace();	
+		}
+	}
+
+	// 영화리스트가 존재하지 않을때 출력할 멘트
+	public void showListEmpty() {
+		System.out.println("검색하신 영화 정보가 존재하지 않습니다 T0T");
+		System.out.println();
+
+	}
+
+	// 사용자모드 3 영화정보검색 / 장르검색
+	public void userView3by2() {
+		try {
+			if (button == 2) {
+				System.out.println("검색할 장르  ▶");
+				String mGenre = sc.next();
+				mvo.setmGenre(mGenre);
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	// 사용자모드 3 영화정보검색 / 종료
+	public void userView3by3() {
+		if (button == 3) {
+			System.out.println();
+			System.out.println("[System]영화 검색을 종료합니다.");
+			System.out.println();
+
+		}
+	}
+
+	// 사용자모드 종료 버튼
+	public void userView4() { // [4]사용자모드 종료
+		System.out.println();
+		System.out.println("[System] 사용자 모드를 종료합니다 :D");
+		System.out.println();
+		// break;
+	}
+
+	// 유효성 검사
+	public void wrongcheck() {
+		System.out.println("잘못된 입력 :(");
+		System.out.println();
+	}
+	public void wrongback() {
+		System.out.println("해당 정보와 일치하는 예매자가 없습니다 :(");
+		System.out.println();
+	}
+
+	// 관리자모드 START================================================================================	
+	// 관리자모드 비밀번호 체크
+	public void adminPasswordCheck() {
+		try {
+			System.out.println("---------------------------------------------------");
+			System.out.println("[관리자 MODE]");
+			System.out.println("관리자 password ▷ ");
+			int password = sc.nextInt();
+			mvo.setPassword(password);
+			System.out.println("---------------------------------------------------");
+			System.out.println();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	// 관리자에서 보여줘야할 영화정보리스트
+	public void adminMovieList(ArrayList<MovieVO> datas) {
+		if (datas.size() == 0) {
+			return;
+		} else {
+			for (MovieVO v : datas) {
+				System.out.println("[" + v.getmNum() + "] " + v.getmName() + " / " + v.getmGenre() + " / "
+						+ v.getmRuntime() + " / " + v.getmCast() + " / " + v.getmInfo());
+			}
+		}
+	}
+
+	// 관리자모드 메뉴 출력
+	public void adminView() {
+		try {
+			System.out.println();
+			System.out.println("	---------------------------------------------------");
+			System.out.printf("	     관리자모드에 입장하셨습니다. 원하시는 버튼을 선택해주세요:-)\n");
+			System.out.println("	---------------------------------------------------");
+			System.out.println();
+			System.out.printf("%20s %15s %15s\n", "①영화추가", "②영화변경&삭제 ", "③관리자모드종료");
+			System.out.println("GO ▷ ");
+			button = sc.nextInt();
+			System.out.println();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	// 관리자모드 1 영화추가
+	public void adminView1() {
+		try {
+			System.out.println();
+			System.out.println("\t■■■■■■■■■■■■■■■■■■■[영화추가]■■■■■■■■■■■■■■■■■■■");
+			System.out.println();
+			System.out.println("영화제목  ▷");
+			String mName = sc.next();
+			mvo.setmName(mName);
+			System.out.println("장르  ▷ ");
+			String mGenre = sc.next();
+			mvo.setmGenre(mGenre);
+			System.out.println("상영시간(분) ▷ ");
+			String mRuntime = sc.next();
+			mvo.setmRuntime(mRuntime);
+			System.out.println("영화감독 ▷ ");
+			String mCast = sc.next();
+			mvo.setmCast(mCast);
+			sc.nextLine();
+			System.out.println("줄거리  ▷ ");
+			String mInfo = sc.nextLine();
+			mvo.setmInfo(mInfo);
+			System.out.println("★☆★☆[영화추가Complete]☆★☆★");
+			System.out.println();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	// 관리자모드 2 영화변경삭제
+	public void adminView2() {
+		try {
+			System.out.println();
+			System.out.println("\t■■■■■■■■■■■■■■■■■■[영화변경&삭제]■■■■■■■■■■■■■■■■■■");
+			System.out.println();
+			System.out.printf("%20s %15s %15s\n", "①변경", "②삭제 ", "③종료");
+			System.out.println("GO ▷ ");
+			button = sc.nextInt();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	// 관리자모드 2 영화변경삭제 - 변경
+	public void adminView2by1() {
+		try {
+			System.out.println();
+			System.out.println("\t■■■■■■■■■■■■■■■■■■■[영화변경]■■■■■■■■■■■■■■■■■■■");
+			System.out.println();
+			System.out.println("변경할 영화 번호 ▷ ");
+			int mNum = sc.nextInt();
+			mvo.setmNum(mNum);
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	public void adminView2by1by1() {
+		try {
+			System.out.println("영화제목 변경 ▷");
+			String mName = sc.next();
+			mvo.setmName(mName);
+			System.out.println("장르 변경 ▷ ");
+			String mGenre = sc.next();
+			mvo.setmGenre(mGenre);
+			System.out.println("변경할 상영시간(분) ▷ ");
+			String mRuntime = sc.next();
+			mvo.setmRuntime(mRuntime);
+			System.out.println("영화감독변경 ▷ ");
+			String mCast = sc.next();
+			mvo.setmCast(mCast);
+			sc.nextLine();
+			System.out.println("줄거리 변경 ▷ ");
+			String mInfo = sc.nextLine();
+			mvo.setmInfo(mInfo);
+			System.out.println("★☆★☆[영화변경 Complete]☆★☆★");
+			System.out.println();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	// 관리자모드 2 영화변경삭제 - 삭제
+	public void adminView2by2() {
+		try {
+			System.out.println();
+			System.out.println("\t■■■■■■■■■■■■■■■■■■■[영화삭제]■■■■■■■■■■■■■■■■■■■");
+			System.out.println();
+			System.out.println("삭제할 영화 번호 입력 ▷ ");
+			int mNum = sc.nextInt();
+			mvo.setmNum(mNum);
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	public void deleteSucceed() {
+		System.out.println("★☆★☆[영화 삭제 Complete]☆★☆★");
+		System.out.println();
+	}
+
+	// 관리자모드 2 영화변경및 삭제 종료
+	public void adminView2by3() {
+		System.out.println();
+		System.out.println("[System]영화변경 및 삭제를 종료합니다.");
+		System.out.println();
+		// break;
+	}
+
+	// 관리자모드 3 관리자모드 종료
+	public void programEnd() {
+		System.out.println();
+		System.out.println("[System]관리자모드를 종료합니다.\n 수고하셨습니다.");
+		System.out.println();
+	}
+
+	// 프로그램 종료
+	public void viewEnd() {
+		System.out.println();
+		System.out.println("[System] 프로그램을 종료합니다 (>'-'<)");
+		// return;
+	}
+
+}</p>
+	<div class = "w3-container w3-center">
+		<p style="font-size:20px">VIEW</p>
+		</div>
+	</div>
+</div>
+
+	</center>
+</body>
+</html>
